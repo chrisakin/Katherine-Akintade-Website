@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar } from 'lucide-react';
 import { BlogPost } from './types';
 import { Link } from 'react-router-dom';

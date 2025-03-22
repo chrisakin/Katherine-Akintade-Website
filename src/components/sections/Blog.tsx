@@ -27,13 +27,13 @@ export default function Blog() {
           .from('blog_posts')
           .select('*')
           .eq('published', true)
-          .order('published_at', { ascending: false });
+          .order('published_at', { ascending: false })
+          .limit(6);
 
         if (error) throw error;
         setPosts(data || []);
       } catch (err) {
         console.error('Error fetching posts:', err);
-        setError('Failed to load blog posts');
       } finally {
         setLoading(false);
       }
@@ -88,12 +88,10 @@ export default function Blog() {
         )}
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {posts.map((post, index) => (
+          {posts.map((post) => (
             <article 
               key={post.id}
-              className={`bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow ${
-                index === 0 ? 'lg:col-span-2 lg:row-span-2' : ''
-              }`}
+              className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="flex items-center space-x-2 text-sm text-gray-600 mb-4">
                 <Calendar size={16} />
@@ -129,6 +127,16 @@ export default function Blog() {
             No blog posts available yet.
           </div>
         )}
+        <div className="text-center mt-12">
+          <Link 
+            to="/blog"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg 
+              hover:bg-gray-800 transition-colors"
+          >
+            View All Posts
+            <ArrowRight size={20} />
+          </Link>
+        </div>
       </div>
     </section>
   );

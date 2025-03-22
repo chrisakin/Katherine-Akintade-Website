@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { Play, Pause, Clock } from 'lucide-react';
+import  { useEffect, useState } from 'react';
+import { Clock, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 
 interface PodcastEpisode {
@@ -25,7 +26,8 @@ export default function Podcast() {
           .from('podcasts')
           .select('*')
           .eq('active', true)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(3);
 
         if (error) throw error;
         setEpisodes(data || []);
@@ -47,7 +49,7 @@ export default function Podcast() {
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-2/4 mb-12"></div>
             <div className="space-y-6">
-              {[1, 2, 3].map((n) => (
+              {[1, 2].map((n) => (
                 <div key={n} className="bg-white rounded-lg p-6">
                   <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
                   <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
@@ -82,7 +84,7 @@ export default function Podcast() {
           Conversations with artists, creators, and innovators about their craft, 
           process, and vision.
         </p>
-        <div className="space-y-6">
+        <div className="space-y-6 grid md:grid-cols-2 lg:grid-cols-3">
           {episodes.map((episode) => (
             <div 
               key={episode.id}
@@ -130,6 +132,16 @@ export default function Podcast() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="text-center mt-12">
+          <Link 
+            to="/podcast"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg 
+              hover:bg-gray-800 transition-colors"
+          >
+            View All Episodes
+            <ArrowRight size={20} />
+          </Link>
         </div>
       </div>
     </section>
