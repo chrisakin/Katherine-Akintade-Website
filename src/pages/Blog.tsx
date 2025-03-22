@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../lib/supabase';
 import { Link } from 'react-router-dom';
 import { Calendar, ArrowRight } from 'lucide-react';
 
@@ -24,13 +24,13 @@ export default function Blog() {
           .from('blog_posts')
           .select('*')
           .eq('published', true)
-          .order('published_at', { ascending: false })
-          .limit(6);
+          .order('published_at', { ascending: false });
 
         if (error) throw error;
         setPosts(data || []);
       } catch (err) {
         console.error('Error fetching posts:', err);
+        setError('Failed to load blog posts');
       } finally {
         setLoading(false);
       }
@@ -41,37 +41,27 @@ export default function Blog() {
 
   if (loading) {
     return (
-      <section id="blog" className="py-24 bg-mint-light/50">
+      <main className="py-24">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="animate-pulse space-y-8">
-            <div className="max-w-3xl mx-auto text-center">
-              <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto"></div>
-            </div>
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/4 mb-12"></div>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((n) => (
-                <div key={n} className="bg-white rounded-lg p-6 shadow-sm">
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded"></div>
-                    <div className="h-4 bg-gray-200 rounded"></div>
-                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                  </div>
-                </div>
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div key={n} className="h-64 bg-gray-200 rounded-lg"></div>
               ))}
             </div>
           </div>
         </div>
-      </section>
+      </main>
     );
   }
 
   return (
-    <section id="blog" className="py-24 bg-mint-light/50">
+    <main className="py-24">
       <div className="max-w-7xl mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-16">
-          <h2 className="text-4xl font-bold mb-6 text-gray-900">Blog</h2>
+          <h1 className="text-4xl font-bold mb-6 text-gray-900">Blog</h1>
           <p className="text-lg text-gray-600 leading-relaxed">
             Personal reflections, creative insights, and stories that inspire. Join me on this journey 
             of self-discovery and artistic exploration.
@@ -124,18 +114,7 @@ export default function Blog() {
             No blog posts available yet.
           </div>
         )}
-
-        <div className="text-center mt-12">
-          <Link 
-            to="/blog"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg 
-              hover:bg-gray-800 transition-colors"
-          >
-            View All Posts
-            <ArrowRight size={20} />
-          </Link>
-        </div>
       </div>
-    </section>
+    </main>
   );
 }

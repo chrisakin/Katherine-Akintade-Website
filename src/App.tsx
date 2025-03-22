@@ -8,6 +8,10 @@ import BlogPost from './pages/BlogPost';
 import Admin from './pages/Admin';
 import ScrollToTop from './components/common/ScrollToTop';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import Photography from './pages/Photography';
+import Blog from './pages/Blog';
+import Shop from './pages/Shop';
+import Podcast from './pages/Podcast';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -25,7 +29,11 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
+        <Route path="/photography" element={<Photography />} />
+        <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/podcast" element={<Podcast />} />
         <Route path="/admin/login" element={<Admin.Login />} />
         <Route 
           path="/admin/*" 

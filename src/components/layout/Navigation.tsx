@@ -51,9 +51,10 @@ export default function Navigation() {
   const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About' },
-    { path: '#photography', label: 'Photography' },
-    { path: '#blog', label: 'Blog' },
-    { path: '#shop', label: 'Shop' }
+    { path: '/photography', label: 'Photography' },
+    { path: '/blog', label: 'Blog' },
+    { path: '/shop', label: 'Shop' },
+    { path: '/podcast', label: 'Podcast' }
   ];
 
   const socialLinks = [
@@ -90,10 +91,9 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             <div className="flex space-x-6 text-sm">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.path}
-                  onClick={(e) => handleNavClick(e, link.path)}
+                  to={link.path}
                   className={`transition-colors hover:opacity-75 ${
                     isScrolled 
                       ? 'text-gray-900' 
@@ -101,7 +101,7 @@ export default function Navigation() {
                   }`}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
 
@@ -129,16 +129,15 @@ export default function Navigation() {
           <div className="md:hidden mt-4 py-4 border-t border-gray-100/10">
             <div className="flex flex-col space-y-4">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.path}
-                  onClick={(e) => handleNavClick(e, link.path)}
+                  to={link.path}
                   className={`transition-colors ${
                     isScrolled ? 'text-gray-900' : 'text-white'
                   }`}
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
               
               <div className="flex space-x-4 pt-4 border-t border-gray-100/10">

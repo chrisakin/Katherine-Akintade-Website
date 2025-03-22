@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
-import { Clock, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { supabase } from '../lib/supabase';
+import { Clock } from 'lucide-react';
 
 interface PodcastEpisode {
   id: string;
@@ -26,8 +25,7 @@ export default function Podcast() {
           .from('podcasts')
           .select('*')
           .eq('active', true)
-          .order('created_at', { ascending: false })
-          .limit(2);
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         setEpisodes(data || []);
@@ -43,48 +41,33 @@ export default function Podcast() {
 
   if (loading) {
     return (
-      <section id="podcast" className="py-16 bg-mint-light">
+      <main className="py-24">
         <div className="max-w-7xl mx-auto px-4">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-2/4 mb-12"></div>
-            <div className="space-y-6">
+            <div className="space-y-8">
               {[1, 2].map((n) => (
-                <div key={n} className="bg-white rounded-lg p-6">
-                  <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
-                </div>
+                <div key={n} className="h-48 bg-gray-200 rounded-lg"></div>
               ))}
             </div>
           </div>
         </div>
-      </section>
-    );
-  }
-
-  if (episodes.length === 0) {
-    return (
-      <section id="podcast" className="py-16 bg-mint-light">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-gray-900">Podcast</h2>
-          <p className="text-gray-600 mb-12">
-            No episodes available at the moment. Check back soon!
-          </p>
-        </div>
-      </section>
+      </main>
     );
   }
 
   return (
-    <section id="podcast" className="py-16 bg-mint-light">
+    <main className="py-24">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-8 text-gray-900">Podcast</h2>
-        <p className="text-gray-600 mb-12 max-w-2xl">
-          Conversations with artists, creators, and innovators about their craft, 
-          process, and vision.
-        </p>
-        <div className="space-y-6">
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <h1 className="text-4xl font-bold mb-6 text-gray-900">Podcast</h1>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            Conversations with artists, creators, and innovators about their craft, process, and vision.
+          </p>
+        </div>
+
+        <div className="space-y-8">
           {episodes.map((episode) => (
             <div 
               key={episode.id}
@@ -133,17 +116,13 @@ export default function Podcast() {
             </div>
           ))}
         </div>
-        <div className="text-center mt-12">
-          <Link 
-            to="/podcast"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg 
-              hover:bg-gray-800 transition-colors"
-          >
-            View All Episodes
-            <ArrowRight size={20} />
-          </Link>
-        </div>
+
+        {episodes.length === 0 && (
+          <div className="text-center text-gray-600">
+            No episodes available at the moment. Check back soon!
+          </div>
+        )}
       </div>
-    </section>
+    </main>
   );
 }

@@ -1,29 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/admin');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     
     try {
-      const success = await login(username, password);
-      if (success) {
-        navigate('/admin');
-      } else {
+      const { error: loginError } = await login(emailOrUsername, password);
+      if (loginError) {
         setError('Invalid credentials');
+      } else {
+        navigate('/admin');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,20 +44,22 @@ export default function Login() {
         
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg">
+            <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
+              <AlertCircle size={20} />
               {error}
             </div>
           )}
           
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Username
+              Email or Username
             </label>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+              value={emailOrUsername}
+              onChange={(e) => setEmailOrUsername(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none 
+                focus:ring-2 focus:ring-gray-400 focus:border-transparent"
               required
             />
           </div>
@@ -61,7 +73,8 @@ export default function Login() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none 
+                  focus:ring-2 focus:ring-gray-400 focus:border-transparent"
                 required
               />
               <button
@@ -76,9 +89,18 @@ export default function Login() {
           
           <button
             type="submit"
-            className="w-full py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+            disabled={loading}
+            className="w-full py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 
+              transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? (
+              <span className="flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                Logging in...
+              </span>
+            ) : (
+              'Login'
+            )}
           </button>
         </form>
       </div>
