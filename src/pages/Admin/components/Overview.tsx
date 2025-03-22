@@ -20,8 +20,9 @@ import {
   BarChart,
   Bar
 } from 'recharts';
-import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { format, subDays, startOfDay, endOfDay, subMonths } from 'date-fns';
 import { getAnalytics } from '../../../lib/analytics';
+import { supabase } from '../../../lib/supabase';
 
 interface AnalyticsData {
   activeUsers: number;
@@ -36,8 +37,29 @@ interface FilterDates {
   endDate: Date;
 }
 
+interface Stats {
+  photos: number;
+  prevPhotos: number;
+  posts: number;
+  prevPosts: number;
+  sales: number;
+  prevSales: number;
+  users: number;
+  prevUsers: number;
+}
+
 export default function Overview() {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [stats, setStats] = useState<Stats>({
+    photos: 0,
+    prevPhotos: 0,
+    posts: 0,
+    prevPosts: 0,
+    sales: 0,
+    prevSales: 0,
+    users: 0,
+    prevUsers: 0
+  });
   const [loading, setLoading] = useState(true);
   const [filterDates, setFilterDates] = useState<FilterDates>({
     startDate: subDays(new Date(), 30),
@@ -45,20 +67,109 @@ export default function Overview() {
   });
   const [showFilters, setShowFilters] = useState(false);
 
+  const calculatePercentageChange = (current: number, previous: number) => {
+    if (previous === 0) return current > 0 ? 100 : 0;
+    return ((current - previous) / previous) * 100;
+  };
+
+  const fetchStats = async () => {
+    try {
+      const currentStart = startOfDay(filterDates.startDate);
+      const currentEnd = endOfDay(filterDates.endDate);
+      const previousStart = subMonths(currentStart, 1);
+      const previousEnd = subMonths(currentEnd, 1);
+
+      // Fetch current period stats
+      const [photosData, postsData, salesData, usersData] = await Promise.all([
+        supabase
+          .from('gallery_images')
+          .select('count')
+          .gte('created_at', currentStart.toISOString())
+          .lte('created_at', currentEnd.toISOString())
+          .single(),
+        supabase
+          .from('blog_posts')
+          .select('count')
+          .gte('created_at', currentStart.toISOString())
+          .lte('created_at', currentEnd.toISOString())
+          .single(),
+        supabase
+          .from('sales_tracking')
+          .select('amount')
+          .gte('created_at', currentStart.toISOString())
+          .lte('created_at', currentEnd.toISOString()),
+        supabase
+          .from('user_sessions')
+          .select('count')
+          .gte('created_at', currentStart.toISOString())
+          .lte('created_at', currentEnd.toISOString())
+          .single()
+      ]);
+
+      // Fetch previous period stats
+      const [prevPhotosData, prevPostsData, prevSalesData, prevUsersData] = await Promise.all([
+        supabase
+          .from('gallery_images')
+          .select('count')
+          .gte('created_at', previousStart.toISOString())
+          .lte('created_at', previousEnd.toISOString())
+          .single(),
+        supabase
+          .from('blog_posts')
+          .select('count')
+          .gte('created_at', previousStart.toISOString())
+          .lte('created_at', previousEnd.toISOString())
+          .single(),
+        supabase
+          .from('sales_tracking')
+          .select('amount')
+          .gte('created_at', previousStart.toISOString())
+          .lte('created_at', previousEnd.toISOString()),
+        supabase
+          .from('user_sessions')
+          .select('count')
+          .gte('created_at', previousStart.toISOString())
+          .lte('created_at', previousEnd.toISOString())
+          .single()
+      ]);
+
+      const currentSalesTotal = salesData.data?.reduce((sum: number, sale: any) => sum + sale.amount, 0) || 0;
+      const prevSalesTotal = prevSalesData.data?.reduce((sum: number, sale: any) => sum + sale.amount, 0) || 0;
+
+      setStats({
+        photos: photosData.data?.count || 0,
+        prevPhotos: prevPhotosData.data?.count || 0,
+        posts: postsData.data?.count || 0,
+        prevPosts: prevPostsData.data?.count || 0,
+        sales: currentSalesTotal,
+        prevSales: prevSalesTotal,
+        users: usersData.data?.count || 0,
+        prevUsers: prevUsersData.data?.count || 0
+      });
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
-    const data = await getAnalytics(
-      startOfDay(filterDates.startDate),
-      endOfDay(filterDates.endDate)
-    );
-    if (data) {
-      setAnalyticsData({
-        ...data,
-        activities: data.activities || [],
-        salesData: data.salesData || [],
-        userActivityData: data.userActivityData || [],
-      });
-    }
+    await Promise.all([
+      fetchStats(),
+      (async () => {
+        const data = await getAnalytics(
+          startOfDay(filterDates.startDate),
+          endOfDay(filterDates.endDate)
+        );
+        if (data) {
+          setAnalyticsData({
+            ...data,
+            activities: data.activities || [],
+            salesData: data.salesData || [],
+            userActivityData: data.userActivityData || [],
+          });
+        }
+      })()
+    ]);
     setLoading(false);
   };
 
@@ -84,36 +195,36 @@ export default function Overview() {
     users: count
   }));
 
-  const stats = [
+  const statsData = [
     {
       title: 'Active Users',
-      value: analyticsData?.activeUsers.toString() || '0',
-      change: '+12.5%',
-      increasing: true,
+      value: stats.users.toString(),
+      change: calculatePercentageChange(stats.users, stats.prevUsers).toFixed(1) + '%',
+      increasing: stats.users >= stats.prevUsers,
       icon: Users,
       color: 'bg-blue-500'
     },
     {
       title: 'Total Sales',
-      value: `₦${(analyticsData?.totalSales || 0).toLocaleString()}`,
-      change: '+23.1%',
-      increasing: true,
+      value: `₦${stats.sales.toLocaleString()}`,
+      change: calculatePercentageChange(stats.sales, stats.prevSales).toFixed(1) + '%',
+      increasing: stats.sales >= stats.prevSales,
       icon: ShoppingBag,
       color: 'bg-green-500'
     },
     {
       title: 'Photos Uploaded',
-      value: '1,234',
-      change: '+18.2%',
-      increasing: true,
+      value: stats.photos.toString(),
+      change: calculatePercentageChange(stats.photos, stats.prevPhotos).toFixed(1) + '%',
+      increasing: stats.photos >= stats.prevPhotos,
       icon: ImageIcon,
       color: 'bg-purple-500'
     },
     {
       title: 'Blog Posts',
-      value: '45',
-      change: '-2.4%',
-      increasing: false,
+      value: stats.posts.toString(),
+      change: calculatePercentageChange(stats.posts, stats.prevPosts).toFixed(1) + '%',
+      increasing: stats.posts >= stats.prevPosts,
       icon: FileText,
       color: 'bg-orange-500'
     }
@@ -196,7 +307,7 @@ export default function Overview() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((stat, index) => (
+        {statsData.map((stat, index) => (
           <div 
             key={index}
             className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"

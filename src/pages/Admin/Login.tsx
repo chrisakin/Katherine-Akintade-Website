@@ -16,7 +16,7 @@ export default function Login() {
   
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/admin');
+      navigate('/admin/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
@@ -30,7 +30,7 @@ export default function Login() {
       if (loginError) {
         setError('Invalid credentials');
       } else {
-        navigate('/admin');
+        navigate('/admin/dashboard');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');

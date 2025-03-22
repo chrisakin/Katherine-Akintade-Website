@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Route, Routes, Link, useLocation } from 'react-router-dom';
+import { Route, Routes, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutGrid, 
   Image, 
@@ -24,11 +24,24 @@ import Profile from './components/Profile';
 export default function Dashboard() {
   const { logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+
+  // Save current route
+  useEffect(() => {
+    sessionStorage.setItem('adminPath', location.pathname);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const path = sessionStorage.getItem('adminPath');
+    if (path && location.pathname.startsWith('/admin') && location.pathname !== path) {
+      navigate(path, { replace: true });
+    }
+  }, [navigate, location.pathname]);
   const navigation = [
-    { name: 'Overview', href: '/admin', icon: LayoutGrid },
+    { name: 'Overview', href: '/admin/dashboard', icon: LayoutGrid },
     { name: 'Photos', href: '/admin/photos', icon: Image },
     { name: 'Blog', href: '/admin/blog', icon: FileText },
     { name: 'Shop', href: '/admin/shop', icon: ShoppingBag },
@@ -112,7 +125,7 @@ export default function Dashboard() {
       } p-4 md:p-8`}>
         <div className="mt-16 md:mt-0">
           <Routes>
-            <Route path="/" element={<Overview />} />
+            <Route path="/dashboard"  element={<Overview />} />
             <Route path="/photos" element={<Photos />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/shop" element={<Shop />} />
