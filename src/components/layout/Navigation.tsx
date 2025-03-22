@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Camera, Menu, X, Instagram, Twitter, Youtube, Facebook } from 'lucide-react';
+import { Menu, X, Instagram, Twitter, Youtube, Facebook } from 'lucide-react';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +9,7 @@ export default function Navigation() {
   const navigate = useNavigate();
   
   const isActive = (path: string) => location.pathname === path;
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,24 +22,20 @@ export default function Navigation() {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     e.preventDefault();
     
-    // If it's a hash link and we're on the home page
     if (path.startsWith('#') && location.pathname === '/') {
       const element = document.querySelector(path);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
-        setIsOpen(false); // Close mobile menu if open
+        setIsOpen(false);
       }
     } else if (path.startsWith('#')) {
-      // If it's a hash link but we're not on home page, navigate home first
       navigate('/', { state: { scrollTo: path } });
     } else {
-      // For non-hash links, use normal navigation
       navigate(path);
       setIsOpen(false);
     }
   };
 
-  // Handle scrolling when navigating from another page
   useEffect(() => {
     if (location.state && location.state.scrollTo) {
       const element = document.querySelector(location.state.scrollTo);
@@ -47,7 +44,6 @@ export default function Navigation() {
           element.scrollIntoView({ behavior: 'smooth' });
         }, 100);
       }
-      // Clear the state
       window.history.replaceState({}, document.title);
     }
   }, [location]);
@@ -67,6 +63,9 @@ export default function Navigation() {
     { icon: Facebook, href: "https://web.facebook.com/katherine.akintade/", label: "Facebook" }
   ];
 
+  // Don't render navigation on admin routes
+  if (isAdminRoute) return null;
+
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
       isScrolled ? 'bg-white/90 backdrop-blur-lg shadow-sm' : 'bg-transparent'
@@ -74,7 +73,6 @@ export default function Navigation() {
       <nav className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="flex items-center space-x-2">
-            <Camera size={24} className={`transition-colors ${isScrolled ? 'text-gray-900' : 'text-white'}`} />
             <span className={`font-medium text-lg transition-colors ${isScrolled ? 'text-gray-900' : 'text-white'}`}>
               Katherine Ayobola Akintade
             </span>

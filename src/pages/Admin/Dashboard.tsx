@@ -55,13 +55,10 @@ export default function Dashboard() {
         flex flex-col
       `}>
         <div className="flex-1 p-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className={`font-semibold ${!isSidebarOpen && 'hidden'}`}>
-              Admin Dashboard
-            </h2>
+          <div className="flex items-center justify-end mb-8">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-              className="p-2 rounded-lg hover:bg-gray-800 hidden md:block"
+              className="p-2 rounded-lg hover:bg-gray-800 hidden md:block flex-shrink-0"
             >
               {isSidebarOpen ? '←' : '→'}
             </button>
@@ -80,8 +77,8 @@ export default function Dashboard() {
                     : 'hover:bg-gray-800'}
                 `}
               >
-                <item.icon size={20} />
-                {isSidebarOpen && <span>{item.name}</span>}
+                <item.icon size={20} className="flex-shrink-0" />
+                {isSidebarOpen && <span className="truncate">{item.name}</span>}
               </Link>
             ))}
           </nav>
@@ -92,8 +89,8 @@ export default function Dashboard() {
             onClick={logout}
             className="flex items-center space-x-3 w-full p-3 rounded-lg hover:bg-gray-800 transition-colors"
           >
-            <LogOut size={20} />
-            {isSidebarOpen && <span>Logout</span>}
+            <LogOut size={20} className="flex-shrink-0" />
+            {isSidebarOpen && <span className="truncate">Logout</span>}
           </button>
         </div>
       </aside>
