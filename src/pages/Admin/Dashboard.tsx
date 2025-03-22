@@ -36,7 +36,7 @@ export default function Dashboard() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-gray-50">
       {/* Mobile menu button */}
       <button
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -52,9 +52,8 @@ export default function Dashboard() {
         md:translate-x-0
         ${isSidebarOpen ? 'w-64' : 'w-20'} 
         bg-gray-900 text-white transition-all duration-300
-        flex flex-col
       `}>
-        <div className="flex-1 p-4">
+        <div className="p-4">
           <div className="flex items-center justify-between mb-8">
             {isSidebarOpen && (
               <h1 className="text-xl font-semibold">Kathe's Dashboard</h1>
@@ -85,12 +84,10 @@ export default function Dashboard() {
               </Link>
             ))}
           </nav>
-        </div>
 
-        <div className="p-4 border-t border-gray-800">
           <button
             onClick={logout}
-            className="flex items-center space-x-3 w-full p-3 rounded-lg hover:bg-gray-800 transition-colors"
+            className="flex items-center space-x-3 w-full p-3 rounded-lg hover:bg-gray-800 transition-colors mt-8"
           >
             <LogOut size={20} className="flex-shrink-0" />
             {isSidebarOpen && <span className="truncate">Logout</span>}

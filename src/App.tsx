@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -14,31 +14,40 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" />;
 }
 
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  return (
+    <div className="min-h-screen bg-white text-gray-900">
+      <Navigation />
+      
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+        <Route path="/admin/login" element={<Admin.Login />} />
+        <Route 
+          path="/admin/*" 
+          element={
+            <PrivateRoute>
+              <Admin.Dashboard />
+            </PrivateRoute>
+          } 
+        />
+      </Routes>
+
+      {!isAdminRoute && <Footer />}
+    </div>
+  );
+}
+
 function App() {
   return (
     <AuthProvider>
       <Router>
         <ScrollToTop />
-        <div className="min-h-screen bg-white text-gray-900">
-          <Navigation />
-          
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
-            <Route path="/admin/login" element={<Admin.Login />} />
-            <Route 
-              path="/admin/*" 
-              element={
-                <PrivateRoute>
-                  <Admin.Dashboard />
-                </PrivateRoute>
-              } 
-            />
-          </Routes>
-
-          <Footer />
-        </div>
+        <AppContent />
       </Router>
     </AuthProvider>
   );
