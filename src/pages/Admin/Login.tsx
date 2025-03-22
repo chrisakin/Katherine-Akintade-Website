@@ -1,65 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SEO from '../../components/SEO';
 import { useAuth } from '../../context/AuthContext';
-import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
-  const [emailOrUsername, setEmailOrUsername] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { login, isAuthenticated } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/admin');
-    }
-  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
     
     try {
-      const { error: loginError } = await login(emailOrUsername, password);
-      if (loginError) {
-        setError('Invalid credentials');
-      } else {
+      const success = await login(username, password);
+      if (success) {
         navigate('/admin');
+      } else {
+        setError('Invalid credentials');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <SEO 
+        title="Admin Login - Katherine Ayobola Akintade"
+        description="Secure admin login page for Katherine Ayobola Akintade's website management."
+      />
       <div className="max-w-md w-full mx-4">
         <h1 className="text-3xl font-bold text-center mb-8">Admin Login</h1>
         
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
           {error && (
-            <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
-              <AlertCircle size={20} />
+            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg">
               {error}
             </div>
           )}
           
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email or Username
+              Username
             </label>
             <input
               type="text"
-              value={emailOrUsername}
-              onChange={(e) => setEmailOrUsername(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none 
-                focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
               required
             />
           </div>
@@ -73,8 +66,7 @@ export default function Login() {
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none 
-                  focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400"
                 required
               />
               <button
@@ -89,18 +81,9 @@ export default function Login() {
           
           <button
             type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 
-              transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
           >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Logging in...
-              </span>
-            ) : (
-              'Login'
-            )}
+            Login
           </button>
         </form>
       </div>

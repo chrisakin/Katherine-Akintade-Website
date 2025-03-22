@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import SEO from '../components/SEO';
 import BackButton from '../components/common/BackButton';
 import { supabase } from '../lib/supabase';
 import { Calendar } from 'lucide-react';
@@ -83,6 +84,13 @@ export default function BlogPost() {
 
   return (
     <main className="py-24">
+      <SEO 
+        title={`${post.title} - Katherine Ayobola Akintade`}
+        description={post.excerpt}
+        type="article"
+        publishedTime={post.published_at}
+        keywords={[post.category, 'blog', 'article', 'photography', 'identity']}
+      />
       <article className="max-w-3xl mx-auto px-4">
         <BackButton className="mb-8" />
         <h1 className="text-4xl font-bold mb-4 text-gray-900">{post.title}</h1>

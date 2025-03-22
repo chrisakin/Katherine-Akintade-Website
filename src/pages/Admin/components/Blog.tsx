@@ -17,6 +17,7 @@ import {
   X
 } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
+import ImageUpload from '../../../components/admin/ImageUpload';
 
 interface BlogPost {
   id: string;
@@ -44,6 +45,7 @@ export default function Blog() {
   const [isEditing, setIsEditing] = useState(false);
   const [currentPost, setCurrentPost] = useState<Partial<BlogPost>>({});
   const [error, setError] = useState('');
+  const [showImageUpload, setShowImageUpload] = useState(false);
 
   const editor = useEditor({
     extensions: [
@@ -156,11 +158,8 @@ export default function Blog() {
     }
   };
 
-  const addImage = () => {
-    const url = prompt('Enter image URL:');
-    if (url) {
-      editor?.chain().focus().setImage({ src: url }).run();
-    }
+  const handleImageUpload = (url: string) => {
+    editor?.chain().focus().setImage({ src: url }).run();
   };
 
   if (!isEditing) {
@@ -372,7 +371,7 @@ export default function Blog() {
                 <ListOrdered size={18} />
               </button>
               <button
-                onClick={addImage}
+                onClick={() => setShowImageUpload(true)}
                 className="p-2 rounded hover:bg-gray-200 transition-colors"
               >
                 <ImageIcon size={18} />
@@ -398,6 +397,13 @@ export default function Blog() {
           </label>
         </div>
       </div>
+
+      {showImageUpload && (
+        <ImageUpload
+          onImageUrl={handleImageUpload}
+          onClose={() => setShowImageUpload(false)}
+        />
+      )}
     </div>
   );
 }

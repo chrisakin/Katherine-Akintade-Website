@@ -9,8 +9,7 @@ import {
   Mic, 
   LogOut,
   Menu,
-  X,
-  User
+  X
 } from 'lucide-react';
 
 // Admin components
@@ -19,7 +18,6 @@ import Photos from './components/Photos';
 import Blog from './components/Blog';
 import Shop from './components/Shop';
 import Podcast from './components/Podcast';
-import Profile from './components/Profile';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -33,7 +31,6 @@ export default function Dashboard() {
     { name: 'Blog', href: '/admin/blog', icon: FileText },
     { name: 'Shop', href: '/admin/shop', icon: ShoppingBag },
     { name: 'Podcast', href: '/admin/podcast', icon: Mic },
-    { name: 'Profile', href: '/admin/profile', icon: User }
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -117,7 +114,6 @@ export default function Dashboard() {
             <Route path="/blog" element={<Blog />} />
             <Route path="/shop" element={<Shop />} />
             <Route path="/podcast" element={<Podcast />} />
-            <Route path="/profile" element={<Profile />} />
           </Routes>
         </div>
       </main>
