@@ -1,12 +1,13 @@
-
+import { useEffect, useState } from 'react';
 import { 
   Users, 
   ShoppingBag, 
   Image as ImageIcon, 
-  FileText, 
-  TrendingUp, 
+  FileText,  
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Calendar,
+  Filter
 } from 'lucide-react';
 import { 
   AreaChart, 
@@ -19,73 +20,179 @@ import {
   BarChart,
   Bar
 } from 'recharts';
+import { format, subDays, startOfDay, endOfDay } from 'date-fns';
+import { getAnalytics } from '../../../lib/analytics';
 
-// Mock data - Replace with real data from your Supabase database
-const salesData = [
-  { month: 'Jan', sales: 4000 },
-  { month: 'Feb', sales: 3000 },
-  { month: 'Mar', sales: 5000 },
-  { month: 'Apr', sales: 2780 },
-  { month: 'May', sales: 1890 },
-  { month: 'Jun', sales: 2390 },
-  { month: 'Jul', sales: 3490 },
-];
+interface AnalyticsData {
+  activeUsers: number;
+  totalSales: number;
+  activities: any[];
+  salesData: any[];
+  userActivityData: any[];
+}
 
-const userActivityData = [
-  { day: 'Mon', users: 24 },
-  { day: 'Tue', users: 13 },
-  { day: 'Wed', users: 98 },
-  { day: 'Thu', users: 39 },
-  { day: 'Fri', users: 48 },
-  { day: 'Sat', users: 38 },
-  { day: 'Sun', users: 43 },
-];
-
-const stats = [
-  {
-    title: 'Total Users',
-    value: '2,847',
-    change: '+12.5%',
-    increasing: true,
-    icon: Users,
-    color: 'bg-blue-500'
-  },
-  {
-    title: 'Total Sales',
-    value: '₦234,500',
-    change: '+23.1%',
-    increasing: true,
-    icon: ShoppingBag,
-    color: 'bg-green-500'
-  },
-  {
-    title: 'Photos Uploaded',
-    value: '1,234',
-    change: '+18.2%',
-    increasing: true,
-    icon: ImageIcon,
-    color: 'bg-purple-500'
-  },
-  {
-    title: 'Blog Posts',
-    value: '45',
-    change: '-2.4%',
-    increasing: false,
-    icon: FileText,
-    color: 'bg-orange-500'
-  }
-];
+interface FilterDates {
+  startDate: Date;
+  endDate: Date;
+}
 
 export default function Overview() {
+  const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [filterDates, setFilterDates] = useState<FilterDates>({
+    startDate: subDays(new Date(), 30),
+    endDate: new Date()
+  });
+  const [showFilters, setShowFilters] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const data = await getAnalytics(
+      startOfDay(filterDates.startDate),
+      endOfDay(filterDates.endDate)
+    );
+    if (data) {
+      setAnalyticsData({
+        ...data,
+        activities: data.activities || [],
+        salesData: data.salesData || [],
+        userActivityData: data.userActivityData || [],
+      });
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [filterDates]);
+
+  // Process sales data for chart
+  const processedSalesData = analyticsData?.salesData?.map(sale => ({
+    date: format(new Date(sale.created_at), 'MMM dd'),
+    amount: sale.amount
+  })) || [];
+
+  // Process user activity data for chart
+  const processedUserData = analyticsData?.userActivityData?.reduce((acc: any, session: any) => {
+    const date = format(new Date(session.created_at), 'EEE');
+    acc[date] = (acc[date] || 0) + 1;
+    return acc;
+  }, {}) || {};
+
+  const userActivityData = Object.entries(processedUserData).map(([day, count]) => ({
+    day,
+    users: count
+  }));
+
+  const stats = [
+    {
+      title: 'Active Users',
+      value: analyticsData?.activeUsers.toString() || '0',
+      change: '+12.5%',
+      increasing: true,
+      icon: Users,
+      color: 'bg-blue-500'
+    },
+    {
+      title: 'Total Sales',
+      value: `₦${(analyticsData?.totalSales || 0).toLocaleString()}`,
+      change: '+23.1%',
+      increasing: true,
+      icon: ShoppingBag,
+      color: 'bg-green-500'
+    },
+    {
+      title: 'Photos Uploaded',
+      value: '1,234',
+      change: '+18.2%',
+      increasing: true,
+      icon: ImageIcon,
+      color: 'bg-purple-500'
+    },
+    {
+      title: 'Blog Posts',
+      value: '45',
+      change: '-2.4%',
+      increasing: false,
+      icon: FileText,
+      color: 'bg-orange-500'
+    }
+  ];
+
+  if (loading) {
+    return (
+      <div className="animate-pulse space-y-8">
+        <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+        <div className="grid grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map(n => (
+            <div key={n} className="h-32 bg-gray-200 rounded"></div>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-8">
+          <div className="h-80 bg-gray-200 rounded"></div>
+          <div className="h-80 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-        <div className="flex items-center gap-2 text-sm text-gray-600">
-          <TrendingUp size={16} className="text-green-500" />
-          <span>Last updated: {new Date().toLocaleDateString()}</span>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <Filter size={18} />
+            Filter
+          </button>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Calendar size={16} />
+            <span>
+              {format(filterDates.startDate, 'MMM dd, yyyy')} - {format(filterDates.endDate, 'MMM dd, yyyy')}
+            </span>
+          </div>
         </div>
       </div>
+
+      {showFilters && (
+        <div className="bg-white p-6 rounded-xl shadow-sm">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={format(filterDates.startDate, 'yyyy-MM-dd')}
+                onChange={(e) => setFilterDates(prev => ({
+                  ...prev,
+                  startDate: new Date(e.target.value)
+                }))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none 
+                  focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                End Date
+              </label>
+              <input
+                type="date"
+                value={format(filterDates.endDate, 'yyyy-MM-dd')}
+                onChange={(e) => setFilterDates(prev => ({
+                  ...prev,
+                  endDate: new Date(e.target.value)
+                }))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none 
+                  focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -114,7 +221,7 @@ export default function Overview() {
               }`}>
                 {stat.change}
               </span>
-              <span className="text-sm text-gray-600">vs last month</span>
+              <span className="text-sm text-gray-600">vs last period</span>
             </div>
           </div>
         ))}
@@ -128,7 +235,7 @@ export default function Overview() {
           <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={salesData}
+                data={processedSalesData}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
               >
                 <defs>
@@ -138,12 +245,12 @@ export default function Overview() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
+                <XAxis dataKey="date" />
                 <YAxis />
                 <Tooltip />
                 <Area 
                   type="monotone" 
-                  dataKey="sales" 
+                  dataKey="amount" 
                   stroke="#4F46E5" 
                   fillOpacity={1} 
                   fill="url(#salesGradient)" 
@@ -177,18 +284,15 @@ export default function Overview() {
       <div className="bg-white p-6 rounded-xl shadow-sm">
         <h3 className="text-lg font-semibold mb-6">Recent Activity</h3>
         <div className="space-y-4">
-          {[
-            { action: 'New user registration', time: '2 minutes ago' },
-            { action: 'New order placed', time: '15 minutes ago' },
-            { action: 'Photo uploaded', time: '1 hour ago' },
-            { action: 'Blog post published', time: '2 hours ago' }
-          ].map((activity, index) => (
+          {analyticsData?.activities?.map((activity, index) => (
             <div 
               key={index}
               className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0"
             >
               <span className="text-gray-700">{activity.action}</span>
-              <span className="text-sm text-gray-500">{activity.time}</span>
+              <span className="text-sm text-gray-500">
+                {format(new Date(activity.created_at), 'MMM d, h:mm a')}
+              </span>
             </div>
           ))}
         </div>

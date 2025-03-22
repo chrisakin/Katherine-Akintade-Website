@@ -13,6 +13,7 @@ import Photography from './pages/Photography';
 import Blog from './pages/Blog';
 import Shop from './pages/Shop';
 import Podcast from './pages/Podcast';
+import { trackUserSession } from './lib/analytics';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -22,7 +23,9 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-
+  React.useEffect(() => {
+    trackUserSession(location.pathname);
+  }, [location.pathname]);
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <Navigation />

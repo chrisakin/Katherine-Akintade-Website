@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, Truck, MapPin, CreditCard } from 'lucide-react';
 import emailjs from '@emailjs/browser';
+import { trackSale, logActivity } from '../../../lib/analytics';
 
 interface CheckoutFormProps {
   onClose: () => void;
@@ -92,6 +93,13 @@ export default function CheckoutForm({ onClose, product }: CheckoutFormProps) {
       );
       
       setShowConfirmation(true);
+      const orderId = `ORDER-${Date.now()}`;
+      await trackSale(orderId, totalAmount);
+      await logActivity('New Order', { 
+      orderId,
+      amount: totalAmount,
+      product: product.name
+    });
     } catch (error) {
       console.error('Failed to send email:', error);
       setError('Failed to send order. Please try again or contact us directly.');
