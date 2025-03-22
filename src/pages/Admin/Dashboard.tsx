@@ -55,7 +55,10 @@ export default function Dashboard() {
         flex flex-col
       `}>
         <div className="flex-1 p-4">
-          <div className="flex items-center justify-end mb-8">
+          <div className="flex items-center justify-between mb-8">
+            {isSidebarOpen && (
+              <h1 className="text-xl font-semibold">Kathe's Dashboard</h1>
+            )}
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="p-2 rounded-lg hover:bg-gray-800 hidden md:block flex-shrink-0"

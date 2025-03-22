@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Trash2, Image as ImageIcon, Film, AlertCircle, Check, X } from 'lucide-react';
-import { supabase, type HeroImage, type GalleryImage } from '../../../lib/supabase';
+import { Upload, Trash2, AlertCircle } from 'lucide-react';
+import { supabase, STORAGE_BUCKET, type HeroImage, type GalleryImage } from '../../../lib/supabase';
 
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const STORAGE_BUCKET = 'media';
 
 interface ImageUploadState {
   file: File | null;
@@ -50,7 +49,7 @@ export default function Photos() {
       setGalleryImages(galleryData || []);
     } catch (err) {
       console.error('Error fetching images:', err);
-      setError('Failed to load images');
+      setError('Failed to load images. Please check your Supabase connection.');
     }
   };
 
@@ -76,7 +75,8 @@ export default function Photos() {
 
       // Create a unique file path
       const fileExt = uploadState.file.name.split('.').pop();
-      const filePath = `${uploadType}/${Date.now()}.${fileExt}`;
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${uploadType}/${fileName}`;
 
       // Upload file to Supabase Storage
       const { error: uploadError } = await supabase.storage
@@ -92,19 +92,11 @@ export default function Photos() {
 
       // Save to database
       if (uploadType === 'hero') {
-        // Deactivate all other hero images first
-        if (heroImages.length > 0) {
-          await supabase
-            .from('hero_images')
-            .update({ active: false })
-            .eq('active', true);
-        }
-
         const { error: dbError } = await supabase
           .from('hero_images')
           .insert([{
             url: publicUrl,
-            active: true
+            active: false
           }]);
 
         if (dbError) throw dbError;
@@ -131,7 +123,7 @@ export default function Photos() {
       fetchImages();
     } catch (err) {
       console.error('Error uploading image:', err);
-      setError('Failed to upload image');
+      setError('Failed to upload image. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -332,13 +324,12 @@ export default function Photos() {
               <div className="p-4 flex justify-between items-center">
                 <button
                   onClick={() => toggleHeroActive(image.id)}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg transition-colors ${
                     image.active 
                       ? 'bg-green-100 text-green-700' 
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {image.active ? <Check size={16} /> : <X size={16} />}
                   {image.active ? 'Active' : 'Inactive'}
                 </button>
                 <button

@@ -9,6 +9,9 @@ if (!supabaseUrl || !supabaseKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
+// Storage bucket name
+export const STORAGE_BUCKET = 'images';
+
 export interface HeroImage {
   id: string;
   url: string;
