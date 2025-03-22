@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
 import Home from './pages/Home';
@@ -8,10 +9,6 @@ import BlogPost from './pages/BlogPost';
 import Admin from './pages/Admin';
 import ScrollToTop from './components/common/ScrollToTop';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Photography from './pages/Photography';
-import Blog from './pages/Blog';
-import Shop from './pages/Shop';
-import Podcast from './pages/Podcast';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -29,11 +26,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/photography" element={<Photography />} />
-        <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/podcast" element={<Podcast />} />
         <Route path="/admin/login" element={<Admin.Login />} />
         <Route 
           path="/admin/*" 
@@ -52,12 +45,14 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <ScrollToTop />
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <HelmetProvider>
+      <AuthProvider>
+        <Router>
+          <ScrollToTop />
+          <AppContent />
+        </Router>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 

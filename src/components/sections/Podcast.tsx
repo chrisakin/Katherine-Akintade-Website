@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { Play, Pause, Clock } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { Clock, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
 
 interface PodcastEpisode {
   id: string;
@@ -26,8 +25,7 @@ export default function Podcast() {
           .from('podcasts')
           .select('*')
           .eq('active', true)
-          .order('created_at', { ascending: false })
-          .limit(2);
+          .order('created_at', { ascending: false });
 
         if (error) throw error;
         setEpisodes(data || []);
@@ -49,7 +47,7 @@ export default function Podcast() {
             <div className="h-8 bg-gray-200 rounded w-1/4 mb-4"></div>
             <div className="h-4 bg-gray-200 rounded w-2/4 mb-12"></div>
             <div className="space-y-6">
-              {[1, 2].map((n) => (
+              {[1, 2, 3].map((n) => (
                 <div key={n} className="bg-white rounded-lg p-6">
                   <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
                   <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
@@ -132,16 +130,6 @@ export default function Podcast() {
               </div>
             </div>
           ))}
-        </div>
-        <div className="text-center mt-12">
-          <Link 
-            to="/podcast"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg 
-              hover:bg-gray-800 transition-colors"
-          >
-            View All Episodes
-            <ArrowRight size={20} />
-          </Link>
         </div>
       </div>
     </section>

@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ProductCard from './shop/ProductCard';
-import { supabase } from '../../lib/supabase';
+import { getProducts } from './shop/shop-data';
 import { Product } from './shop/types';
-import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
 
 export default function Shop() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -11,22 +9,8 @@ export default function Shop() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('active', true)
-        .order('created_at', { ascending: false })
-        .limit(4);
-
-      if (!error && data) {
-        setProducts(data.map(product => ({
-          name: product.name,
-          price: product.price,
-          description: product.description,
-          category: product.category,
-          image: product.image_url
-        })));
-      }
+      const data = await getProducts();
+      setProducts(data);
       setLoading(false);
     };
 
@@ -75,16 +59,6 @@ export default function Shop() {
           {products.map((product, index) => (
             <ProductCard key={index} product={product} />
           ))}
-        </div>
-        <div className="text-center mt-12">
-          <Link 
-            to="/shop"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg 
-              hover:bg-gray-800 transition-colors"
-          >
-            View All Products
-            <ArrowRight size={20} />
-          </Link>
         </div>
       </div>
     </section>
