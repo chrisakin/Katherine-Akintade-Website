@@ -24,10 +24,20 @@ interface BlogPost {
   slug: string;
   content: any;
   excerpt: string;
+  category: string;
   published: boolean;
   published_at: string | null;
   created_at: string;
 }
+
+const categories = [
+  'Identity',
+  'Photography',
+  'Lifestyle',
+  'Creativity',
+  'Personal Growth',
+  'General'
+];
 
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -85,6 +95,11 @@ export default function Blog() {
         return;
       }
 
+      if (!currentPost.category) {
+        setError('Category is required');
+        return;
+      }
+
       const slug = currentPost.title
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
@@ -95,6 +110,7 @@ export default function Blog() {
         slug,
         content: editor.getJSON(),
         excerpt: currentPost.excerpt,
+        category: currentPost.category,
         published: currentPost.published || false,
         published_at: currentPost.published ? new Date().toISOString() : null,
       };
@@ -182,9 +198,17 @@ export default function Blog() {
                   <h3 className="text-xl font-semibold text-gray-900">
                     {post.title}
                   </h3>
-                  <p className="text-sm text-gray-500">
-                    {format(new Date(post.created_at), 'MMM d, yyyy')}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="text-sm text-gray-500">
+                      {format(new Date(post.created_at), 'MMM d, yyyy')}
+                    </p>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      post.category === 'Identity' ? 'bg-coral-light' :
+                      post.category === 'Photography' ? 'bg-sky-light' : 'bg-mint'
+                    }`}>
+                      {post.category || 'General'}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -274,6 +298,25 @@ export default function Blog() {
               focus:ring-2 focus:ring-gray-400 focus:border-transparent"
             placeholder="Enter post title"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Category
+          </label>
+          <select
+            value={currentPost.category || ''}
+            onChange={(e) => setCurrentPost(prev => ({ ...prev, category: e.target.value }))}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none 
+              focus:ring-2 focus:ring-gray-400 focus:border-transparent"
+          >
+            <option value="">Select a category</option>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div>
