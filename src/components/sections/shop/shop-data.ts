@@ -1,11 +1,23 @@
+import { supabase } from '../../../lib/supabase';
 import { Product } from './types';
 
-export const products: Product[] = [
-  {
-    name: "Identity Journal",
-    price: 7000,
-    description: "Discover you with the Identity Journal – a guided journey to embracing your uniqueness and building your confidence.",
-    category: "Journal",
-    image: "https://raw.githubusercontent.com/stackblitz/stackblitz-codeflow/main/assets/identity-journal.jpg"
+export const getProducts = async (): Promise<Product[]> => {
+  const { data, error } = await supabase
+    .from('products')
+    .select('*')
+    .eq('active', true)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching products:', error);
+    return [];
   }
-];
+
+  return data.map(product => ({
+    name: product.name,
+    price: product.price,
+    description: product.description,
+    category: product.category,
+    image: product.image_url
+  }));
+};
