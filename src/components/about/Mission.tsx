@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Camera, Heart, Brain } from 'lucide-react';
 
 const pillars = [

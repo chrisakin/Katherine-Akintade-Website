@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import BlogCard from './blog/BlogCard';
+import  { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Link } from 'react-router-dom';
 import { Calendar, ArrowRight } from 'lucide-react';
@@ -17,7 +16,6 @@ interface BlogPost {
 export default function Blog() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -81,12 +79,6 @@ export default function Blog() {
           </p>
         </div>
 
-        {error && (
-          <div className="max-w-3xl mx-auto mb-8 p-4 bg-red-50 text-red-700 rounded-lg text-center">
-            {error}
-          </div>
-        )}
-
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
             <article 
@@ -122,7 +114,7 @@ export default function Blog() {
           ))}
         </div>
 
-        {posts.length === 0 && !error && (
+        {posts.length === 0 && (
           <div className="text-center text-gray-600">
             No blog posts available yet.
           </div>

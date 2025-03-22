@@ -1,4 +1,4 @@
-import React from 'react';
+
 import ImageCard from './ImageCard';
 import { type GalleryImage } from '../../lib/supabase';
 

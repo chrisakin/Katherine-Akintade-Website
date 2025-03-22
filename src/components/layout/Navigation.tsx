@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import  { useState, useEffect } from 'react';
+import { Link, useLocation} from 'react-router-dom';
 import { Menu, X, Instagram, Twitter, Youtube, Facebook } from 'lucide-react';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
   
-  const isActive = (path: string) => location.pathname === path;
   const isAdminRoute = location.pathname.startsWith('/admin');
 
   useEffect(() => {
@@ -19,22 +17,7 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
-    e.preventDefault();
-    
-    if (path.startsWith('#') && location.pathname === '/') {
-      const element = document.querySelector(path);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-        setIsOpen(false);
-      }
-    } else if (path.startsWith('#')) {
-      navigate('/', { state: { scrollTo: path } });
-    } else {
-      navigate(path);
-      setIsOpen(false);
-    }
-  };
+
 
   useEffect(() => {
     if (location.state && location.state.scrollTo) {

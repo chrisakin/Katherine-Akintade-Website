@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Instagram, Twitter, Youtube, Facebook } from 'lucide-react';
 
 export default function SocialLinks() {
@@ -13,7 +13,7 @@ export default function SocialLinks() {
           className="text-gray-600 hover:text-gray-900 transition-colors"
           aria-label="Instagram"
         >
-          <Instagram size={20} />
+        <Instagram size={20} />
         </a>
         <a 
           href="https://x.com/ayobolae" 

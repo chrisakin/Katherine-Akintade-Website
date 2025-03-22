@@ -18,7 +18,7 @@ export default function Podcast() {
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState<string | null>(null);
-
+  console.log(playing)
   useEffect(() => {
     const fetchEpisodes = async () => {
       try {

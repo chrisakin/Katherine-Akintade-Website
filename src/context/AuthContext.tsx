@@ -14,33 +14,34 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) { // Accept children
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
-       // Check active sessions and sets the user
-       supabase.auth.getSession().then(({ data: { session } }) => {
-        setUser(session?.user ?? null);
-        setIsAuthenticated(!!session?.user);
-        if (session?.user) {
-          fetchProfile(session.user.id);
-        }
-      });
-  
-      // Listen for changes on auth state
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        setUser(session?.user ?? null);
-        setIsAuthenticated(!!session?.user);
-        if (session?.user) {
-          await fetchProfile(session.user.id);
-        } else {
-          setProfile(null);
-        }
-      });
-  
-      return () => subscription.unsubscribe();
+    // Check active sessions and set user
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setIsAuthenticated(!!session?.user);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      }
+    });
+
+    // Listen for changes in auth state
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log(event);
+      setUser(session?.user ?? null);
+      setIsAuthenticated(!!session?.user);
+      if (session?.user) {
+        await fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const fetchProfile = async (userId: string) => {
@@ -117,9 +118,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         updatePassword 
       }}
     >
+      {children} {/* Ensure children are rendered */}
     </AuthContext.Provider>
   );
 }
+
 
 export function useAuth() {
   const context = useContext(AuthContext);

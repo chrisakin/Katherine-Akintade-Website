@@ -1,4 +1,4 @@
-import React from 'react';
+
 import Newsletter from './Newsletter';
 import { Mail, Phone } from 'lucide-react';
 

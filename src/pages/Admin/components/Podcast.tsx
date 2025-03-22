@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit3, Trash2, AlertCircle, Upload, X, Check, Play, Pause } from 'lucide-react';
+import { Plus, Edit3, Trash2, AlertCircle, Upload, X, Check } from 'lucide-react';
 import { supabase, STORAGE_BUCKET } from '../../../lib/supabase';
 
 interface Podcast {
@@ -31,7 +31,7 @@ export default function Podcast() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState<string | null>(null);
-
+console.log(playing)
   useEffect(() => {
     fetchPodcasts();
   }, []);
@@ -186,9 +186,9 @@ export default function Podcast() {
     }
   };
 
-  const togglePlay = (id: string) => {
-    setPlaying(playing === id ? null : id);
-  };
+  // const togglePlay = (id: string) => {
+  //   setPlaying(playing === id ? null : id);
+  // };
 
   if (!isEditing) {
     return (

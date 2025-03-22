@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Clock } from 'lucide-react';
 
@@ -17,7 +17,7 @@ export default function Podcast() {
   const [episodes, setEpisodes] = useState<PodcastEpisode[]>([]);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState<string | null>(null);
-
+  console.log(playing)
   useEffect(() => {
     const fetchEpisodes = async () => {
       try {

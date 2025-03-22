@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -12,7 +12,6 @@ import {
   Plus,
   Edit3,
   Trash2,
-  Eye,
   Check,
   X
 } from 'lucide-react';

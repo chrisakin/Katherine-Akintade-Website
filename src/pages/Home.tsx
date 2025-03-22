@@ -1,4 +1,3 @@
-import React from 'react';
 import SEO from '../components/SEO';
 import Hero from '../components/sections/Hero';
 import Photography from '../components/sections/Photography';

@@ -1,4 +1,4 @@
-import React from 'react';
+
 import SEO from '../components/SEO';
 import AboutHero from '../components/about/AboutHero';
 import BackButton from '../components/common/BackButton';

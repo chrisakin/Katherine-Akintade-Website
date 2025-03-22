@@ -26,7 +26,6 @@ function AppContent() {
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <Navigation />
-      
       <Routes>
       <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
