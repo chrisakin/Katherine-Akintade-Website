@@ -12,6 +12,11 @@
   "dependencies": {
     "@emailjs/browser": "^4.1.0",
     "@supabase/supabase-js": "^2.39.7",
+    "@tiptap/extension-image": "^2.2.4",
+    "@tiptap/pm": "^2.2.4",
+    "@tiptap/react": "^2.2.4",
+    "@tiptap/starter-kit": "^2.2.4",
+    "date-fns": "^3.3.1",
     "lucide-react": "^0.344.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
