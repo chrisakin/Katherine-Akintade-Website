@@ -1,5 +1,5 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate, useLocation } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
@@ -18,6 +18,23 @@ import { trackUserSession } from './lib/analytics';
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
   return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" />;
+}
+
+function AppContent() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  React.useEffect(() => {
+    trackUserSession(location.pathname);
+  }, [location.pathname]);
+
+  return (
+    <div className="min-h-screen bg-white text-gray-900">
+      <Navigation />
+      <RouterProvider router={router} />
+      {!isAdminRoute && <Footer />}
+    </div>
+  );
 }
 
 const router = createBrowserRouter(
@@ -65,20 +82,10 @@ const router = createBrowserRouter(
   ],
   {
     future: {
-      v7_relativeSplatPath: true, // ✅ Enable v7 relative splat path behavior early
+      v7_relativeSplatPath: true, // ✅ Fix React Router warning for v7
     },
   }
 );
-
-function AppContent() {
-  return (
-    <div className="min-h-screen bg-white text-gray-900">
-      <Navigation />
-      <RouterProvider router={router} />
-      <Footer />
-    </div>
-  );
-}
 
 function App() {
   return (
