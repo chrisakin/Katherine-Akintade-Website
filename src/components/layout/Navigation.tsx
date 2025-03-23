@@ -8,6 +8,12 @@ export default function Navigation() {
   const location = useLocation();
   
   const isAdminRoute = location.pathname.startsWith('/admin');
+   class PageChecker {
+    static isNotHomePage(pathname: string): boolean {
+      return pathname !== "/";
+    }
+  }
+  const isNotHome = PageChecker.isNotHomePage(location.pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,7 +71,7 @@ export default function Navigation() {
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className={`md:hidden p-2 rounded-lg transition-colors ${
-              isScrolled ? 'hover:bg-gray-100' : 'hover:bg-white/10'
+              isScrolled || isNotHome ? 'hover:bg-gray-100' : 'hover:bg-white/10'
             }`}
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -78,7 +84,7 @@ export default function Navigation() {
                   key={link.label}
                   to={link.path}
                   className={`transition-colors hover:opacity-75 ${
-                    isScrolled 
+                    isScrolled || isNotHome
                       ? 'text-gray-900' 
                       : 'text-white'
                   }`}
@@ -96,7 +102,7 @@ export default function Navigation() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`transition-colors hover:opacity-75 ${
-                    isScrolled ? 'text-gray-900' : 'text-white'
+                    isScrolled || isNotHome ? 'text-gray-900' : 'text-white'
                   }`}
                   aria-label={link.label}
                 >
@@ -116,7 +122,7 @@ export default function Navigation() {
                   key={link.label}
                   to={link.path}
                   className={`transition-colors ${
-                    isScrolled ? 'text-gray-900' : 'text-white'
+                    isScrolled || isNotHome ? 'text-gray-900' : 'text-white'
                   }`}
                 >
                   {link.label}
@@ -131,7 +137,7 @@ export default function Navigation() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className={`transition-colors hover:opacity-75 ${
-                      isScrolled ? 'text-gray-900' : 'text-white'
+                      isScrolled || isNotHome ? 'text-gray-900' : 'text-white'
                     }`}
                     aria-label={link.label}
                   >
