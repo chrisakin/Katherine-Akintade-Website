@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import Navigation from './components/layout/Navigation';
 import Footer from './components/layout/Footer';
@@ -20,35 +20,62 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return isAuthenticated ? <>{children}</> : <Navigate to="/admin/login" />;
 }
 
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <Home />,
+    },
+    {
+      path: "/about",
+      element: <About />,
+    },
+    {
+      path: "/photography",
+      element: <Photography />,
+    },
+    {
+      path: "/blog",
+      element: <Blog />,
+    },
+    {
+      path: "/blog/:slug",
+      element: <BlogPost />,
+    },
+    {
+      path: "/shop",
+      element: <Shop />,
+    },
+    {
+      path: "/podcast",
+      element: <Podcast />,
+    },
+    {
+      path: "/admin/login",
+      element: <Admin.Login />,
+    },
+    {
+      path: "/admin/*",
+      element: (
+        <PrivateRoute>
+          <Admin.Dashboard />
+        </PrivateRoute>
+      ),
+    },
+  ],
+  {
+    future: {
+      v7_relativeSplatPath: true, // ✅ Enable v7 relative splat path behavior early
+    },
+  }
+);
+
 function AppContent() {
-  const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith('/admin');
-  React.useEffect(() => {
-    trackUserSession(location.pathname);
-  }, [location.pathname]);
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <Navigation />
-      <Routes>
-      <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/photography" element={<Photography />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/podcast" element={<Podcast />} />
-        <Route path="/admin/login" element={<Admin.Login />} />
-        <Route 
-          path="/admin/*" 
-          element={
-            <PrivateRoute>
-              <Admin.Dashboard />
-            </PrivateRoute>
-          } 
-        />
-      </Routes>
-
-      {!isAdminRoute && <Footer />}
+      <RouterProvider router={router} />
+      <Footer />
     </div>
   );
 }
@@ -57,10 +84,8 @@ function App() {
   return (
     <HelmetProvider>
       <AuthProvider>
-        <Router>
-          <ScrollToTop />
-          <AppContent />
-        </Router>
+        <ScrollToTop />
+        <AppContent />
       </AuthProvider>
     </HelmetProvider>
   );
