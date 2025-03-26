@@ -28,7 +28,6 @@ if(!isAdminRoute) {
     trackUserSession(location.pathname);
   }, [location.pathname]);
 }
-
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <Navigation />
