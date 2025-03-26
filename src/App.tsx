@@ -23,9 +23,11 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  React.useEffect(() => {
+if(!isAdminRoute) {
+    React.useEffect(() => {
     trackUserSession(location.pathname);
   }, [location.pathname]);
+}
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <Navigation />
