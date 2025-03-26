@@ -67,29 +67,29 @@ export default function Photos() {
   };
 
   const handleUpload = async () => {
+    console.log('reach here 1')
     if (!uploadState.file) return;
 
     try {
       setUploading(true);
       setError('');
-
+      console.log('reach here 2')
       // Create a unique file path
       const fileExt = uploadState.file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${uploadType}/${fileName}`;
-
+      console.log('reach here 3')
       // Upload file to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from(STORAGE_BUCKET)
         .upload(filePath, uploadState.file);
 
       if (uploadError) throw uploadError;
-
+      console.log('reach here 4')
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from(STORAGE_BUCKET)
         .getPublicUrl(filePath);
-
       // Save to database
       if (uploadType === 'hero') {
         const { error: dbError } = await supabase
@@ -98,7 +98,7 @@ export default function Photos() {
             url: publicUrl,
             active: false
           }]);
-
+          console.log('reach here 5')
         if (dbError) throw dbError;
       } else {
         const { error: dbError } = await supabase
@@ -109,10 +109,10 @@ export default function Photos() {
             category: uploadState.category,
             photographer: uploadState.photographer
           }]);
-
+          console.log('reach here 6')
         if (dbError) throw dbError;
       }
-
+      console.log('reach here 7')
       // Reset form and refresh images
       setUploadState({
         file: null,
@@ -120,7 +120,9 @@ export default function Photos() {
         category: '',
         photographer: ''
       });
+      console.log('reach here 8')
       fetchImages();
+      console.log('reach here 9')
     } catch (err) {
       console.error('Error uploading image:', err);
       setError('Failed to upload image. Please try again.');
