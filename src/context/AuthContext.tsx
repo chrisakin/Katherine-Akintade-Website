@@ -97,6 +97,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) { // A
     setUser(null);
     setIsAuthenticated(false);
     setProfile(null);
+    localStorage.clear()
   };
 
   const updatePassword = async (newPassword: string) => {

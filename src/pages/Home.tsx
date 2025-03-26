@@ -6,6 +6,7 @@ import Shop from '../components/sections/Shop';
 import Podcast from '../components/sections/Podcast';
 
 export default function Home() {
+  localStorage.clear()
   return (
     <main>
       <SEO />
