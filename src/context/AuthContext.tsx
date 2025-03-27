@@ -26,6 +26,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) { // A
       setIsAuthenticated(!!session?.user);
       if (session?.user) {
         fetchProfile(session.user.id);
+      }else {
+        supabase.auth.refreshSession()
       }
     });
 
